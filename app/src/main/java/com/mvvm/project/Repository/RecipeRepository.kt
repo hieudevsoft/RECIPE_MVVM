@@ -1,7 +1,6 @@
 package com.mvvm.project.Repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.mvvm.project.Retrofit.Recipe
 import com.mvvm.project.Retrofit.RecipeApiClient
 
@@ -12,7 +11,7 @@ class RecipeRepository private constructor() {
         return recipeApiClient.getRecipes()
     }
 
-    fun searchRecipeApi(query:String, page:Int){
+    fun searchRecipeApi(query: String?, page:Int){
         var pageNumber = page
         if(pageNumber==0) pageNumber = 1
         recipeApiClient.searchRecipesApi(query,pageNumber)

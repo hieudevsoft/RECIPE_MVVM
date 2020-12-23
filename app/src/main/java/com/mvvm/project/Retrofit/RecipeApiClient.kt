@@ -26,7 +26,7 @@ class RecipeApiClient private constructor() {
     fun getRecipes():LiveData<MutableList<Recipe>?> = mRecipes
 
     private var mRetrieveRecipesRunnable: RetrieveRecipesRunnable? = null
-    fun searchRecipesApi(query: String, pageNumber: Int) {
+    fun searchRecipesApi(query: String?, pageNumber: Int) {
         if (mRetrieveRecipesRunnable != null) {
             mRetrieveRecipesRunnable = null
         }
@@ -40,7 +40,7 @@ class RecipeApiClient private constructor() {
     }
 
     private inner class RetrieveRecipesRunnable(
-        private val query: String,
+        private val query: String?,
         private val pageNumber: Int
     ) :
         Runnable {
@@ -72,7 +72,7 @@ class RecipeApiClient private constructor() {
             }
         }
 
-        private fun getRecipes(query: String, pageNumber: Int): Call<RecipeSearchResponse> {
+        private fun getRecipes(query: String?, pageNumber: Int): Call<RecipeSearchResponse> {
             return RetrofitInstance.getApi.searchRecipes(
                 query, pageNumber.toString()
             )

@@ -9,7 +9,7 @@ class RecipeListViewModel: ViewModel() {
     var  recipeRepository:RecipeRepository = RecipeRepository.instance
 
     var getRecipes = recipeRepository.getRecipes()
-    fun searchRecipeApi(query: String, page:Int){
+    fun searchRecipeApi(query: String?, page:Int){
         recipeRepository.searchRecipeApi(query,page)
     }
 }

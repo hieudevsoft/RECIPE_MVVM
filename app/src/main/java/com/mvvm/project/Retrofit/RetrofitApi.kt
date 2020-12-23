@@ -11,8 +11,8 @@ interface RetrofitApi{
     @GET("search")
     fun searchRecipes(
 //    @Query("key") key:String,
-    @Query("q") query:String,
-    @Query("page") page:String
+        @Query("q") query: String?,
+        @Query("page") page:String
     ): Call<RecipeSearchResponse>
 
     @GET("get")
