@@ -8,7 +8,7 @@ class RecipeResponse{
    @SerializedName("recipe")
    @Expose
    private lateinit var recipe:Recipe
-   public fun getRecipe():Recipe{ return recipe;}
+   fun getRecipe():Recipe{ return recipe;}
     override fun toString(): String {
         return "RecipeResponse(recipe=$recipe)"
     }

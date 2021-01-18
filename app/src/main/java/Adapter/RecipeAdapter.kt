@@ -1,58 +1,129 @@
 package Adapter
 
 import Interface.OnRecipeListener
+import MyHolder.CategoriesHolder
+import MyHolder.LoadingHolder
+import MyHolder.RecipeHolder
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.mvvm.project.R
 import com.mvvm.project.Retrofit.Recipe
-import kotlin.math.roundToInt
+import com.mvvm.project.Utils.Constants
 
-class RecipeAdapter(private var context: Context,private var mOnRecipeListener: OnRecipeListener) :
-    RecyclerView.Adapter<RecipeAdapter.MyViewHolder>() {
+
+class RecipeAdapter(private var context: Context, private var mOnRecipeListener: OnRecipeListener) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val RECIPE_TYPE = 1;
+    private val LOADING_TYPE = 2;
+    private val CATEGORY_TYPE = 3;
     private var listRecipe:List<Recipe> = emptyList()
-    inner class MyViewHolder(itemView: View,private var mOnRecipeListener: OnRecipeListener):RecyclerView.ViewHolder(itemView),View.OnClickListener{
-        init {
-            itemView.setOnClickListener(this as View.OnClickListener)
-        }
-        fun setData(recipe:Recipe){
-            val requestOptions = RequestOptions().placeholder(R.drawable.image_load)
-            Glide.with(itemView.context)
-                .setDefaultRequestOptions(requestOptions)
-                .load(recipe.image_url)
-                .into(itemView.findViewById(R.id.recipe_image))
-            itemView.findViewById<TextView>(R.id.recipe_title).text = recipe.title
-            itemView.findViewById<TextView>(R.id.recipe_publisher).text = recipe.publisher
-            itemView.findViewById<TextView>(R.id.recipe_social_score).text = recipe.social_rank.roundToInt()
-                .toString()
-        }
-
-        override fun onClick(v: View?) {
-            mOnRecipeListener.onRecipeClick(adapterPosition)
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_recipe_list_item,parent,false)
-        return MyViewHolder(view,mOnRecipeListener)
-    }
-
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val item = listRecipe[position]
-        item.let { holder.setData(it) }
-    }
 
     override fun getItemCount(): Int {
-            return listRecipe?.size!!
+            return listRecipe.size
     }
-    fun setRecipeList(list:List<Recipe>){
+
+    fun setRecipeList(list: List<Recipe>){
         listRecipe = list
         notifyDataSetChanged()
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val type = getItemViewType(position)
+        if(type==RECIPE_TYPE){
+            val item = listRecipe[position]
+            (holder as RecipeHolder).setData(item)
+        }
+        if(type==CATEGORY_TYPE){
+            val  item = listRecipe[position]
+            (holder as CategoriesHolder).setData(item)
+        }
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when(viewType){
+            RECIPE_TYPE -> {
+                val view = LayoutInflater.from(context).inflate(
+                    R.layout.layout_recipe_list_item,
+                    parent,
+                    false
+                )
+                RecipeHolder(view, mOnRecipeListener)
+            }
+            LOADING_TYPE -> {
+                val view = LayoutInflater.from(context).inflate(
+                    R.layout.loading_layout,
+                    parent,
+                    false
+                )
+                LoadingHolder(view)
+            }
+            CATEGORY_TYPE -> {
+                val view = LayoutInflater.from(context).inflate(
+                    R.layout.layout_category_list_item,
+                    parent,
+                    false
+                )
+                CategoriesHolder(view, mOnRecipeListener)
+            }
+            else->{
+                val view = LayoutInflater.from(context).inflate(
+                    R.layout.layout_recipe_list_item,
+                    parent,
+                    false
+                )
+                RecipeHolder(view, mOnRecipeListener)
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if(listRecipe[position].social_rank == -1f){
+            return CATEGORY_TYPE;
+        }
+        else if(listRecipe[position].title.equals("loading")){
+            return LOADING_TYPE;
+        }
+        else{
+            return RECIPE_TYPE;
+        }
+    }
+
+    private fun isLoading():Boolean{
+        if(listRecipe.isNotEmpty()){
+            return listRecipe[listRecipe.size - 1].title=="loading"
+        }
+        return false
+    }
+
+     fun displayLoading(){
+        if(!isLoading()){
+            val recipe = Recipe("loading", "", null, "", "", 0F)
+            val list = ArrayList<Recipe>()
+            list.add(recipe)
+            listRecipe = list
+            notifyDataSetChanged()
+        }
+    }
+    fun displaySearchCategories() {
+        val categories: MutableList<Recipe> = ArrayList()
+        for (i in Constants.DEFAULT_SEARCH_CATEGORIES.indices) {
+            val recipe: Recipe = Recipe("loading", "", null, "", "", 0F)
+            recipe.title = Constants.DEFAULT_SEARCH_CATEGORIES[i]
+            recipe.image_url = Constants.DEFAULT_SEARCH_CATEGORY_IMAGES[i]
+            recipe.social_rank = -1f
+            categories.add(recipe)
+        }
+        listRecipe = categories
+        notifyDataSetChanged()
+    }
+
+    fun getRecipeClick(position:Int): Recipe? {
+        listRecipe?.let {
+            if(listRecipe.isNotEmpty()) return listRecipe[position]
+        }
+        return null
     }
 }

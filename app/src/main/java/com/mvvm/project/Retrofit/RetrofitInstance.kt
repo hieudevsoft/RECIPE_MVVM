@@ -4,7 +4,7 @@ import com.mvvm.project.Utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-public class RetrofitInstance{
+class RetrofitInstance{
     companion object{
         private val instance: Retrofit by lazy {
             Retrofit.Builder()
