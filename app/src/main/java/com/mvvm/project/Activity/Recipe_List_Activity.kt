@@ -40,10 +40,17 @@ class Recipe_List_Activity : BaseActivity(),OnRecipeListener {
             it?.let {
                 if (recipeListViewModel.isViewingRecipes) {
                     recipeListViewModel.isPerformingQuery = true
+                    recipeListViewModel.didRetrieveListRecipe = true
                     adapter.setRecipeList(it)
                 }
-
             }
+        })
+        recipeListViewModel.getRequestListRecipeTimeout().observe(this, {
+            if (it && !recipeListViewModel.didRetrieveListRecipe) Toast.makeText(
+                applicationContext,
+                "Request Recipe Timeout",
+                Toast.LENGTH_SHORT
+            ).show()
 
         })
     }

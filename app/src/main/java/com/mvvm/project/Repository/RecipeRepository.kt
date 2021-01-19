@@ -36,6 +36,7 @@ class RecipeRepository private constructor() {
     }
 
     fun getRequestRecipeTimeout():LiveData<Boolean> = recipeApiClient.getRequestRecipeTimeout()
+    fun getRequestListRecipeTimeout():LiveData<Boolean> = recipeApiClient.getRequestListRecipeTimeout()
 
     private object Holder {
         val INSTANCE = RecipeRepository()

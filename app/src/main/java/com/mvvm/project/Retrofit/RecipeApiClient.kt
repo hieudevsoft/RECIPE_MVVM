@@ -26,9 +26,11 @@ class RecipeApiClient private constructor() {
     private val mRecipes: MutableLiveData<MutableList<Recipe>?> = MutableLiveData()
     private val mRecipe: MutableLiveData<Recipe> = MutableLiveData()
     private val mRequestRecipeTimeOut: MutableLiveData<Boolean> = MutableLiveData()
+    private val mRequestRecipeListTimeOut:MutableLiveData<Boolean> = MutableLiveData()
     fun getRecipes():LiveData<MutableList<Recipe>?> = mRecipes
     fun getRecipe():LiveData<Recipe> = mRecipe
     fun getRequestRecipeTimeout():LiveData<Boolean> = mRequestRecipeTimeOut
+    fun getRequestListRecipeTimeout():LiveData<Boolean> = mRequestRecipeListTimeOut
 
     private var mRetrieveRecipesRunnable: RetrieveRecipesRunnable? = null
     private var mRetrieveRecipeRunnable: RetrieveRecipeRunnable? = null
@@ -38,9 +40,11 @@ class RecipeApiClient private constructor() {
         }
         mRetrieveRecipesRunnable = RetrieveRecipesRunnable(query, pageNumber)
         val handler = AppExecutors.instance.getNetWorkIO().submit(mRetrieveRecipesRunnable)
-
+        mRequestRecipeListTimeOut.value = false
         // Set a timeout for the data refresh
-        AppExecutors.instance.getNetWorkIO().schedule(Runnable { // let the user know it timed out
+        AppExecutors.instance.getNetWorkIO().schedule(Runnable {
+            mRequestRecipeListTimeOut.postValue(true)
+            // let the user know it timed out
             handler.cancel(true)
         }, Constants.CONNECTION_TIMEOUT.toLong(), TimeUnit.SECONDS)
     }
