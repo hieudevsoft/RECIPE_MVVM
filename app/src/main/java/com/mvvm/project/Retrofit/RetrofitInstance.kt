@@ -12,7 +12,6 @@ class RetrofitInstance{
                 .baseUrl(Constants.BASE_URL)
                 .build()
         }
-
         private val api = instance.create(RetrofitApi::class.java)
 
         public val getApi = api
